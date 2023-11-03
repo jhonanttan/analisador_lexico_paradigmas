@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Analisador Léxico para Expressões Lógicas</title>
+</head>
+<body>
+    <div class="particles-bg" id="particles-js"></div>
+    
+    <div class="container">
+        <h1>Analisador Léxico para Expressões Lógicas</h1>
+        <p>Insira uma expressão lógica:</p>
+        <textarea id="inputExpression" rows="3" cols="50" placeholder="Insira sua expressão aqui..."></textarea>
+        <p>OU</p>
+        <p>Faça o upload de um arquivo (opcional):</p>
+        <input type="file" id="fileInput" accept=".txt" style="display: none;">
+        <label class="custom-file-input" for="fileInput">Selecionar arquivo</label> <!-- Botão personalizado para seleção de arquivo -->
+        <button onclick="analisar()">Analisar</button>
+        <p>Resultado:</p>
+        <p id="outputResult"></p>
+    </div>
+
+    <script>
+        // Função pra iniciar a analise
+        function analisar() {
+            // variavelzinha com o valor da entrada de texto
+            const inputExpression = document.getElementById('inputExpression').value;
+    
+            // Guardando o elemento de entrada de arquivo com o ID 'fileInput'
+            const fileInput = document.getElementById('fileInput');
+    
+            // Obtendo o resultado da análise que será exibido com o ID 'outputResult'
+            const outputResult = document.getElementById('outputResult');
+    
+            // Obtém o primeiro arquivo selecionado pelo usuário no programa
+            const selectedFile = fileInput.files[0];
+    
+            // Verificando se o arquivo foi selecionado
+            if (selectedFile) {
+                // Criando uma instacia com Filereader pra ler o conteúdo do arquivo que o usuário enviou
+                const reader = new FileReader();
+    
+                // manipulador de eventos para quando o arquivo for lido com sucesso
+                reader.onload = function (e) {
+                    // Lendo o conteúdo 
+                    const fileContents = e.target.result;
+                    // função pra analisar o conteúdo do arquivo(chamando)
+                    analyzeContents(fileContents);
+                };
+    
+                // Iniciando a leitura do arquivo
+                reader.readAsText(selectedFile);
+            } else {
+                // Chama a função de leitura da expressão
+                analyzeContents(inputExpression);
+            }
+        }
+    
+        // Função pra analisar o conteúdo
+        function analyzeContents(contents) {
+            // Ignorando comentários 
+            const cleanExpression = contents.replace(/\/\/.*/g, '');
+    
+            // Define uma expressão regular para identificar os diferentes tokens
+            const tokenRegex = /(True|False|¬|[A-Za-z][A-Za-z0-9]{0,99}|\(|\)|\+|\*|->|<->)/g;
+    
+            // Encontrando os tokens da todos os tokens na expressão
+            const tokens = cleanExpression.match(tokenRegex);
+    
+            // Verificando se tem tokens
+            if (tokens) {
+                // Aqui utilizamos o método map() para classificar os tokens de acordo com sua natureza
+                const identification = tokens.map((token) => {
+                    if (token === 'True') {
+                        return `${token} (Constante Verdadeira)`;
+                    } else if (token === 'False') {
+                        return `${token} (Constante Falsa)`;
+                    } else if (token === '¬') {
+                        return `${token} (Negação)`;
+                    } else if (token === '+') {
+                        return `${token} (Operador OR)`;
+                    } else if (token === '*') {
+                        return `${token} (Operador AND)`;
+                    } else if (token === '->') {
+                        return `${token} (Operador de Implicação)`;
+                    } else if (token === '<->') {
+                        return `${token} (Operador Bicondicional)`;
+                    } else if (token === '(' || token === ')') {
+                        return `${token} (Parêntese)`;
+                    } else if (/[A-Za-z][A-Za-z0-9]{0,99}/.test(token)) {
+                        return `${token} (Identificador)`;
+                    } else {
+                        return token;
+                    }
+                });
+    
+                // Exibindo o resultado da análise na telinhas do usuário papai, alguém tá lendo isso? espero que não. Vai corinthians!! VSFD PALMEIRAS
+                outputResult.innerHTML = 'Tokens encontrados: ' + identification.join(', ');
+            } else {
+                // Exibindo na pagina se nenhum token for encntrado que nenhum token foi encontrado la 
+                outputResult.innerHTML = 'Nenhum token encontrado na expressão.';
+            }
+        }
+    </script>
+    
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+
+        // pode igonorar isso aqui, é só pra criar as particulas do background que ficam se mechendo e depois estilizar com css
+        particlesJS("particles-js", {
+            "particles": { 
+                "number": {
+                    "value": 50
+                },
+                "color": {
+                    "value": "#ffffff"
+                },
+                "shape": {
+                    "type": "circle"
+                },
+                "opacity": {
+                    "value": 0.5
+                },
+                "size": {
+                    "value": 3
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 100
+                }
+            }
+        });
+    </script>
+</body>
+</html>
